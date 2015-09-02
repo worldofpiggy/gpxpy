@@ -360,10 +360,24 @@ class GPXRoutePoint(mod_geo.Location):
                                      'horizontal_dilution', 'vertical_dilution', 'position_dilution')
 
 
+
+class GPXTrackPointExtension():
+    """ 
+    Define extensions to handle, for each track point
+    
+    Not used (yet): handling only heart rate 
+    """
+    def __init__(self, hr, ext1=None, ext2=None):
+        self.hr   = hr
+        self.ext1 = ext1
+        self.ext2 = ext2 
+    
+    
+
 class GPXTrackPoint(mod_geo.Location):
     def __init__(self, latitude, longitude, elevation=None, time=None, symbol=None, comment=None,
                  horizontal_dilution=None, vertical_dilution=None, position_dilution=None, speed=None,
-                 name=None):
+                 name=None, hr=None):
         mod_geo.Location.__init__(self, latitude, longitude, elevation)
 
         self.time = time
@@ -376,7 +390,8 @@ class GPXTrackPoint(mod_geo.Location):
         self.position_dilution = position_dilution      # Position dilution of precision
 
         self.speed = speed
-
+        self.hr = hr
+        
     def __repr__(self):
         representation = '%s, %s' % (self.latitude, self.longitude)
         for attribute in 'elevation', 'time', 'symbol', 'comment', 'horizontal_dilution', \

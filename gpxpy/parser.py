@@ -432,6 +432,30 @@ class GPXParser:
 
         return track_segment
 
+
+    def __parse_track_point_extension(self, node):
+        child_nodes = self.xml_parser.get_children(node)
+        point_ext = 0
+
+        for child_node in child_nodes:
+            if self.xml_parser.get_node_name(child_node) == 'TrackPointExtension':
+                point_ext = self.__parse_extensions(child_node)
+                
+        return point_ext
+
+                
+    # return value of gpxtpx:hr node
+    def __parse_extensions(self, node):
+        child_nodes = self.xml_parser.get_children(node)
+        point_hr = 0
+
+        for child_node in child_nodes:
+            if self.xml_parser.get_node_name(child_node) == 'hr':
+                point_hr = mod_utils.to_number(self.xml_parser.get_node_data(child_node), 
+                                               default=None, nan_value=None)
+        return point_hr
+        
+    
     def __parse_track_point(self, node):
         latitude = self.xml_parser.get_node_attribute(node, 'lat')
         if latitude:
@@ -448,6 +472,11 @@ class GPXParser:
         elevation_node = self.xml_parser.get_first_child(node, 'ele')
         elevation = mod_utils.to_number(self.xml_parser.get_node_data(elevation_node),
                                         default=None, nan_value=None)
+
+        extension_node  = self.xml_parser.get_first_child(node, 'extensions')
+        # this should return a list of extensions 
+        # worldofpiggy work in progress 
+        point_hr = self.__parse_track_point_extension(extension_node)
 
         sym_node = self.xml_parser.get_first_child(node, 'sym')
         symbol = self.xml_parser.get_node_data(sym_node)
@@ -472,7 +501,7 @@ class GPXParser:
 
         return mod_gpx.GPXTrackPoint(latitude=latitude, longitude=longitude, elevation=elevation, time=time,
                                      symbol=symbol, comment=comment, horizontal_dilution=hdop, vertical_dilution=vdop,
-                                     position_dilution=pdop, speed=speed, name=name)
+                                     position_dilution=pdop, speed=speed, name=name, hr=point_hr)
 
 
 if __name__ == '__main__':
